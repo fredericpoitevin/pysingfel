@@ -93,11 +93,28 @@ def calculate_diffraction_pattern_gpu(reciprocal_space, particle, return_type='i
         pattern_cos, pattern_sin, atom_type_num, cuda_split_index,
         pixel_number)
 
-    # Add the hydration layer
+    # Add solvent contributions
     if particle.mesh is not None:
+        
+        # Add the bulk solvent (if not in vacuo)
+        if not particle.in_vacuo:
+            water_position = np.ascontiguousarray(particle.mesh[~particle.solute_mask,:])
+            water_num = np.sum(~particle.solute_mask)
+            water_prefactor = -particle.solvent_mean_electron_density * particle.mesh_voxel_size*
+
+            cuda_water_position = cuda.to_device(water_position)
+
+            calculate_solvent_pattern_gpu_back_engine[(pixel_number + 511) // 512, 512](
+                cuda_reciprocal_position, cuda_water_position,
+                pattern_cos, pattern_sin, water_prefactor, water_num,
+                pixel_number)
+
+        # Add the hydration layer
         water_position = np.ascontiguousarray(particle.mesh[particle.solvent_mask,:])
         water_num = np.sum(particle.solvent_mask)
-        water_prefactor = particle.solvent_mean_electron_density * particle.mesh_voxel_size**3
+        water_prefactor = particle.hydration_layer_electron_density * particle.mesh_voxel_size**3
+        if not particle.in_vacuo:
+            water_prefactor -= particle.solvent_mean_electron_density * particle.mesh_voxel_size**3
 
         cuda_water_position = cuda.to_device(water_position)
 
