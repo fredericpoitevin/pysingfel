@@ -21,7 +21,9 @@ class FXSExperiment(Experiment):
         ratios /= ratios.sum()  # Normalize to 1
         self.ratios = ratios
 
-    def generate_new_sample_state(self):
+    def generate_new_sample_state(self, multi_particle_hit=False):
+        # added multi_particle_hit variable as it was introduced by Deeban for SPI.
+        # Will need to review whether that is a useful approach...
         """
         Return a list of "particle group"
 
