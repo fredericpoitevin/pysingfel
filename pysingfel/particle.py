@@ -156,6 +156,15 @@ class Particle(object):
     def get_q_sample(self):
         return self.q_sample
 
+    def set_in_vacuo(self, in_vacuo):
+        self.in_vacuo = in_vacuo
+
+    def set_solvent_mean_electron_density(self, solvent_mean_electron_density):
+        self.solvent_mean_electron_density = solvent_mean_electron_density
+
+    def set_hydration_layer_electron_density(self, hydration_layer_electron_density):
+        self.hydration_layer_electron_density = hydration_layer_electron_density
+
     def set_hydration_layer_thickness(self, hydration_layer_thickness):
         self.hydration_layer_thickness = hydration_layer_thickness
 
